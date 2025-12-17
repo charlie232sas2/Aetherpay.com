@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherPay - PIN Setup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* (Replicate base styles or link a separate stylesheet) */
+        :root {
+            --primary-color: #00B3FF;
+            --background-start: #0A1128;
+            --background-end: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            min-height: 100vh;
+            color: #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-frame {
+            background-color: #F8F8F8;
+            border-radius: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .cta-button {
+            /* Example: Blue gradient */
+            background:#233a45;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+        }
+        
+        /* 2. ADD ANIMATION KEYFRAMES AND CLASS */
+        @keyframes pulse-support {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pulse-support {
+            animation: pulse-support 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+        
+        <div class="flex justify-end mb-4 -mt-2">
+            <a href="https://twitter.com/AetherPaySupport" target="_blank" title="Customer Support"
+               class="text-blue-500 hover:text-blue-700 transition duration-150 animate-pulse-support">
+                <i class="fas fa-headset text-xl"></i>
+            </a>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Enter Your PIN</h2>
+        <p class="text-gray-600 mb-8">Confirm transfer details and authorize payment.</p>
+
+        <div class="mb-10">
+            <input type="code" id="pin-input" class="w-full text-center text-3xl p-4 border-2 border-gray-300 rounded-xl tracking-[1rem]" maxlength="4" placeholder="••••">
+        </div>
+        
+        <button id="pin-submit" class="cta-button w-full">
+            Confirm Transfer
+        </button>
+
+        <p id="transfer-summary" class="text-sm text-gray-500 mt-6"></p>
+
+    </div>
+
+    <script>
+        const TEMP_TRANSFER_KEY = 'aetherPayTempTransferData'; 
+        const USER_PIN_KEY = 'aetherPayUserPIN'; // New key for user-set PIN
+        const OTP_CONFIRMATION_URL = 'otpconfirmation.html';
+
+        /**
+         * Generates a mock 6-digit OTP string.
+         * In a real application, this would be done securely on the server.
+         */
+        function generateMockOTP() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const transferData = JSON.parse(sessionStorage.getItem(TEMP_TRANSFER_KEY));
+            const storedPin = sessionStorage.getItem(USER_PIN_KEY); // Get the user's PIN
+            
+            const summaryElement = document.getElementById('transfer-summary');
+            const pinInput = document.getElementById('pin-input');
+            const submitButton = document.getElementById('pin-submit');
+            
+            // Check if PIN has been set
+            if (!storedPin) {
+                summaryElement.innerHTML = `⚠️ **Error:** PIN not set. Please <a href="pincreation.html" class="text-blue-500 underline">set your PIN</a> first.`;
+                submitButton.disabled = true;
+                return;
+            }
+
+            if (!transferData) {
+                summaryElement.textContent = "Error: Transfer data missing. Please start over.";
+                return;
+            }
+
+            // Display a summary of the transfer being confirmed
+            summaryElement.innerHTML = `Sending **${transferData.totalCost.toFixed(2)} ${transferData.sourceCurrency}** to **${transferData.recipientName}**.`;
+            
+            // Handle the PIN submission click
+            submitButton.addEventListener('click', () => {
+                const pin = pinInput.value;
+
+                if (pin.length !== 4) {
+                    alert("Please enter a 4-digit PIN.");
+                    return;
+                }
+
+                // Check the entered PIN against the user's chosen PIN
+                if (pin === storedPin) { 
+                    
+                    // 1. Store validated PIN (if needed for the next step)
+                    sessionStorage.setItem('aetherPayValidatedPIN', pin); 
+                    
+                    // 2. Generate and store the mock OTP and its 30-second expiry time
+                    const mockOTP = generateMockOTP(); 
+                    const otpExpiryTime = Date.now() + 30000;
+
+                    sessionStorage.setItem('aetherPayMockOTP', mockOTP);
+                    sessionStorage.setItem('aetherPayOTPExpiry', otpExpiryTime.toString());
+
+                    console.log(`[DEV INFO] Mock OTP for next page: ${mockOTP}`);
+                    
+                    // 3. Redirect to the OTP confirmation page
+                    window.location.href = OTP_CONFIRMATION_URL;
+
+                } else {
+                    alert("Invalid PIN. Please try again.");
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

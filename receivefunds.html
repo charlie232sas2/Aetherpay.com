@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherPay - Deposit Funds</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary-color: #00B3FF;
+            --secondary-color: #0077B6;
+            --background-start: #0A1128;
+            --background-end: #000000;
+            --accent-green: #34D399; /* Used for success buttons/icons */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            min-height: 100vh;
+            color: #E5E7EB;
+        }
+
+        .glass-card {
+            background-color: white;
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 5px 30px 0 rgba(0, 0, 0, 0.4);
+            transition: all 0.4s ease;
+        }
+
+        /* Styling the inner content container to mimic the mobile frame */
+        .mobile-frame {
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            border-radius: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .cta-button-copy {
+           
+            background: white;
+            color: black;
+            transition: all 0.3s ease;
+        }
+        .cta-button-copy:hover {
+            background-color:#233a45;
+        }
+
+        .cta-button-share {
+            background-color: var(--accent-green);
+            color: #111827; /* Dark text for bright button */
+            transition: all 0.3s ease;
+        }
+        .cta-button-share:hover {
+            background-color: #10B981;
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-md mx-auto py-4 md:py-12">
+        <div class="mobile-frame p-4 sm:p-6 md:p-8">
+
+            <header class="mb-8">
+                <div class="flex items-center space-x-3">
+                    <a href="wallet.html" class="p-2 rounded-full bg-gray-700/50 hover:bg-gray-700">
+                        <i data-lucide="arrow-left" class="w-5 h-5 text-gray-300"></i>
+                    </a>
+                    <h1 class="text-xl font-bold text-white">
+                        Deposit via Bank Transfer
+                    </h1>
+                </div>
+            </header>
+
+            <div class="glass-card p-6 rounded-xl mb-10">
+                <h2 class="text-sm font-semibold text-black mb-4 uppercase">Your AetherPay Details</h2>
+                
+                <div class="detail-item">
+                    <i data-lucide="scan" class="w-6 h-6 mr-4 text-black"></i>
+                    <div>
+                        <span class="text-xs text-black block">Account Number</span>
+                        <p id="client-account-number" class="text-2xl font-bold text-black">912 567 6479</p>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <i data-lucide="building-2" class="w-6 h-6 mr-4 text-black"></i>
+                    <div>
+                        <span class="text-xs text-black block">Bank Name</span>
+                        <p id="client-bank-name" class="text-lg font-medium text-black">AetherPay Banking Corp.</p>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <i data-lucide="user" class="w-6 h-6 mr-4 text-black"></i>
+                    <div>
+                        <span class="text-xs text-black block">Account Name </span>
+                        <p id="client-full-name" class="text-lg font-medium text-black">Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-10">
+                <button onclick="copyDetail('account')" class="cta-button-copy w-full py-3 rounded-xl text-md font-semibold flex items-center justify-center space-x-2">
+                    <i data-lucide="copy" class="w-5 h-5"></i>
+                    <span>Copy Number</span>
+                </button>
+                <button onclick="shareDetails()" class="cta-button-share w-full py-3 rounded-xl text-md font-semibold flex items-center justify-center space-x-2">
+                    <i data-lucide="share-2" class="w-5 h-5"></i>
+                    <span>Share Details</span>
+                </button>
+            </div>
+
+            <div class="bg-gray-900/40 p-5 rounded-xl">
+                <h3 class="text-lg font-semibold text-white mb-4">Add money via bank transfer in 3 steps:</h3>
+                <ol class="space-y-4 text-gray-300">
+                    <li class="flex items-start">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-color text-center text-sm font-bold text-black mr-3">1</span>
+                        <p>Copy the Virtual Account Number above.</p>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-color text-center text-sm font-bold text-black mr-3">2</span>
+                        <p>Open your external bank app or website to initiate a transfer.</p>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-primary-color text-center text-sm font-bold text-black mr-3">3</span>
+                        <p>Transfer the desired amount to your AetherPay Account using the details provided.</p>
+                    </li>
+                </ol>
+                
+            </div>
+            
+            <div id="copy-status" class="fixed bottom-0 left-1/2 transform -translate-x-1/2 mb-4 p-3 bg-green-500 rounded-lg text-white font-medium shadow-lg hidden transition-all duration-300">
+                Details copied successfully!
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // --- Configuration & Data ---
+        const CLIENT_KEY = 'aetherPayClientName'; 
+        const clientFullName = localStorage.getItem(CLIENT_KEY);
+
+        // Fixed AetherPay Details (excluding dynamic full name)
+        const AETHERPAY_DETAILS = {
+            accountNumber: "912 567 6479",
+            bankName: "AetherPay Banking Corp."
+        };
+        
+        // --- Security Check ---
+        if (!clientFullName) {
+            // If the user isn't logged in (no name stored), redirect them
+            window.location.href = 'auth.html';
+        }
+
+        /**
+         * Populates the page with client data and handles the initial setup.
+         */
+        function initializePage() {
+            document.getElementById('client-account-number').textContent = AETHERPAY_DETAILS.accountNumber;
+            document.getElementById('client-bank-name').textContent = AETHERPAY_DETAILS.bankName;
+            
+            // Set the dynamic client name
+            document.getElementById('client-full-name').textContent = clientFullName || "Client Name Missing";
+        }
+
+        /**
+         * Copies the selected detail to the clipboard.
+         * @param {string} type - 'account' or 'all'
+         */
+        function copyDetail(type) {
+            let textToCopy = '';
+            
+            if (type === 'account') {
+                // Copy only the account number
+                textToCopy = AETHERPAY_DETAILS.accountNumber.replace(/\s/g, ''); // Remove spaces for clean copy
+            } else if (type === 'all') {
+                 // Text for the 'Share' button
+                textToCopy = `Deposit to AetherPay:\nBank: ${AETHERPAY_DETAILS.bankName}\nAccount Name: ${clientFullName}\nAccount Number: ${AETHERPAY_DETAILS.accountNumber}`;
+            }
+
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    showCopyStatus(type === 'account' ? 'Account Number Copied!' : 'Details Copied!');
+                })
+                .catch(err => {
+                    console.error('Could not copy text: ', err);
+                    showCopyStatus('Error copying. Please try again.', true);
+                });
+        }
+        
+        /**
+         * Shares all account details using the native Share API.
+         */
+        function shareDetails() {
+            const shareText = `Deposit to AetherPay:\nBank: ${AETHERPAY_DETAILS.bankName}\nAccount Name: ${clientFullName}\nAccount Number: ${AETHERPAY_DETAILS.accountNumber}`;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'AetherPay Deposit Details',
+                    text: shareText,
+                }).catch(error => {
+                    console.log('Sharing failed', error);
+                });
+            } else {
+                // Fallback for desktop/non-share supporting environments
+                copyDetail('all');
+            }
+        }
+        
+        /**
+         * Displays a temporary notification bar.
+         */
+        function showCopyStatus(message, isError = false) {
+            const statusEl = document.getElementById('copy-status');
+            statusEl.textContent = message;
+            
+            if (isError) {
+                statusEl.classList.add('bg-red-500');
+                statusEl.classList.remove('bg-green-500');
+            } else {
+                statusEl.classList.add('bg-green-500');
+                statusEl.classList.remove('bg-red-500');
+            }
+
+            statusEl.classList.remove('hidden');
+            setTimeout(() => {
+                statusEl.classList.add('hidden');
+            }, 3000);
+        }
+
+
+        // --- Initial Load Setup ---
+        window.onload = function() {
+            if (clientFullName) {
+                initializePage();
+            } else {
+                // This scenario should be caught by the earlier security check, but for robustness:
+                document.getElementById('client-full-name').textContent = "Please sign in.";
+                setTimeout(() => window.location.href = 'auth.html', 2000);
+            }
+        }
+    </script>
+
+</body>
+</html>

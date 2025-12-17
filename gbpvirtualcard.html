@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">AetherPay - GBP Virtual Card</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Reusing original AetherPay color scheme */
+        :root {
+            --primary-color: #00B3FF;
+            --secondary-color: #0077B6;
+            --background-start: #0A1128;
+            --background-end: #000000;
+            --dark-surface: #121930;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-surface); 
+            min-height: 100vh;
+            color: #E5E7EB;
+        }
+
+        .mobile-frame {
+            background-color: var(--dark-surface); 
+            border-radius: 0;
+            box-shadow: none;
+            min-height: 100vh;
+        }
+
+        .cta-button {
+            background: linear-gradient(90deg, #0077B6 0%, var(--primary-color) 100%);
+            box-shadow: 0 4px 15px rgba(0, 179, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            box-shadow: 0 8px 25px rgba(0, 179, 255, 0.8);
+            transform: scale(1.005);
+        }
+        
+        .virtual-card {
+            background-color: #0d1222; 
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            aspect-ratio: 1.586/1;
+            position: relative;
+            border: 1px solid rgba(0, 179, 255, 0.1); 
+            transition: transform 0.3s ease;
+        }
+        .virtual-card:hover {
+            transform: scale(1.02);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="max-w-md mx-auto min-h-screen">
+        <div class="mobile-frame w-full px-4 pt-4 pb-12">
+            
+            <header class="flex items-center justify-between mb-8">
+                <a href="wallet.html" class="text-primary-color hover:text-white transition duration-200">
+                    <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                </a>
+                <h1 class="text-xl font-bold text-white">GBP Virtual Card</h1>
+                <div class="w-6 h-6"></div> </header>
+            
+            <h1 class="text-2xl font-bold text-white mb-6 flex items-center">
+                <i data-lucide="credit-card" class="w-6 h-6 mr-2 text-primary-color"></i>
+                GBP Virtual Card
+            </h1>
+            
+            <div id="virtual-card" class="virtual-card p-4 mb-8 text-white relative flex flex-col justify-between">
+                
+                <div class="flex justify-between items-start">
+                    <div class="w-12 h-8 bg-gray-600 rounded-md shadow-inner"></div> 
+                    <span class="text-3xl font-extrabold text-white">GBP</span>
+                </div>
+                
+                <div class="font-mono text-xl md:text-2xl tracking-widest mb-4">
+                    <span id="card-display-number">4123 **** **** 2022</span>
+                </div>
+                
+                <div class="flex justify-between items-center text-xs font-semibold uppercase">
+                    <div>
+                        <p class="text-gray-400">CARD HOLDER</p>
+                        <p id="card-holder-name" class="text-sm font-medium">DEMO USER</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">EXPIRES</p>
+                        <p class="text-sm font-medium">12/28</p>
+                    </div>
+                    <div>
+                        <p class="text-gray-400">CVV</p>
+                        <p id="card-cvv-display" class="text-sm font-medium">***</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mb-8">
+                <p class="text-gray-400 text-lg mb-2">Current Balance</p>
+                <p id="current-balance" class="text-4xl font-extrabold text-white transition-all duration-700">£0.00</p>
+            </div>
+            
+            <button id="detail-cta-button" onclick="toggleDetails()" class="cta-button w-full py-4 rounded-xl text-lg font-bold block mb-8 flex items-center justify-center">
+                <i id="cta-icon" data-lucide="eye" class="w-5 h-5 mr-2"></i>
+                <span id="cta-text">Show Full Card Details</span>
+            </button>
+            
+            <div id="full-details-panel" class="bg-gray-800/50 p-4 rounded-lg hidden border border-primary-color/30 mb-8">
+                <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <p class="text-gray-400">Full Card Number</p>
+                    <p id="full-card-number" class="text-white font-mono text-sm">4123 1234 5678 2022</p>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <p class="text-gray-400">CVV</p>
+                    <p id="full-card-cvv" class="text-white font-mono text-sm">789</p>
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <p class="text-gray-400">Expiry Date</p>
+                    <p class="text-white font-mono text-sm">12/28</p>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h2 class="text-xl font-bold text-white mb-4 flex items-center">
+                    <i data-lucide="receipt" class="w-5 h-5 mr-2 text-primary-color"></i>
+                    Recent Card Transactions
+                </h2>
+                
+                <div class="bg-gray-800/50 p-6 rounded-lg text-center">
+                    <i data-lucide="clock" class="w-6 h-6 text-gray-500 mb-2"></i>
+                    <p class="text-gray-400 text-sm mb-4">Card transaction history is currently unavailable.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+        
+        // --- Configuration & Data (SHARED WITH WALLET.HTML) ---
+        const CLIENT_KEY = 'aetherPayClientName'; 
+        const DEFAULT_CLIENT_NAME = 'DEMO USER';
+        const getDepositKey = (clientName) => `depositComplete_${clientName.replace(/\s/g, '_')}`;
+        
+        const clientFullName = localStorage.getItem(CLIENT_KEY);
+        const DEPOSIT_KEY = getDepositKey(clientFullName || DEFAULT_CLIENT_NAME);
+        
+        // --- Currency-Specific Data ---
+        const CURRENCY_CODE = 'GBP';
+        const CURRENCY_SYMBOL = '£';
+        const MASKED_CARD_NUMBER = '4123 **** **** 2022';
+        const FULL_CARD_NUMBER = '4123 1234 5678 2022';
+        const CARD_CVV = '789';
+        
+        // Target state GBP balance (from wallet.html targetWallet)
+        const TARGET_BALANCE = 650000.00;
+        const INITIAL_BALANCE = 0.00;
+
+        /**
+         * Renders personalized elements and initial state.
+         */
+        function initializePage() {
+            if (!clientFullName || !localStorage.getItem('aetherPayCredentials')) {
+                window.location.href = 'auth.html';
+                return;
+            }
+            
+            const displayClientName = clientFullName ? clientFullName.toUpperCase() : DEFAULT_CLIENT_NAME;
+            document.getElementById('card-holder-name').textContent = displayClientName;
+            
+            document.getElementById('cta-text').textContent = 'Show Full Card Details';
+
+            liveBalanceUpdater();
+        }
+
+        /**
+         * Fetches the current GBP balance and updates the UI.
+         */
+        function updateBalanceUI() {
+            const isDepositComplete = localStorage.getItem(DEPOSIT_KEY) === 'true';
+            const balance = isDepositComplete ? TARGET_BALANCE : INITIAL_BALANCE;
+
+            const formatter = new Intl.NumberFormat('en-GB', {
+                style: 'currency',
+                currency: CURRENCY_CODE,
+                minimumFractionDigits: 2,
+            });
+            
+            document.getElementById('current-balance').textContent = formatter.format(balance);
+        }
+
+        /**
+         * Checks the deposit status periodically and updates the UI if the balance changes.
+         */
+        function liveBalanceUpdater() {
+            updateBalanceUI();
+            
+            const intervalId = setInterval(() => {
+                const isDepositComplete = localStorage.getItem(DEPOSIT_KEY) === 'true';
+                
+                if (isDepositComplete) {
+                    updateBalanceUI();
+                    clearInterval(intervalId);
+                    console.log(`${CURRENCY_CODE} Card balance updated from dashboard simulation.`);
+                }
+            }, 1000); 
+        }
+
+
+        /**
+         * Toggles the display of the full card details panel and unmasks the main card.
+         */
+        function toggleDetails() {
+            const panel = document.getElementById('full-details-panel');
+            const ctaText = document.getElementById('cta-text');
+            const ctaIcon = document.getElementById('cta-icon');
+            const cardNumberDisplay = document.getElementById('card-display-number');
+            const cvvDisplay = document.getElementById('card-cvv-display');
+
+            if (panel.classList.contains('hidden')) {
+                // Show details
+                panel.classList.remove('hidden');
+                ctaText.textContent = 'Hide Full Card Details';
+                ctaIcon.setAttribute('data-lucide', 'eye-off');
+                cardNumberDisplay.textContent = FULL_CARD_NUMBER; 
+                cvvDisplay.textContent = CARD_CVV; 
+                document.getElementById('full-card-cvv').textContent = CARD_CVV;
+            } else {
+                // Hide details
+                panel.classList.add('hidden');
+                ctaText.textContent = 'Show Full Card Details';
+                ctaIcon.setAttribute('data-lucide', 'eye');
+                cardNumberDisplay.textContent = MASKED_CARD_NUMBER; 
+                cvvDisplay.textContent = '***';
+                document.getElementById('full-card-cvv').textContent = '***';
+            }
+            lucide.createIcons();
+        }
+
+        // --- Initial Load ---
+        window.onload = function() {
+            initializePage();
+        }
+    </script>
+
+</body>
+</html>

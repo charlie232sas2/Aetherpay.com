@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherPay - Set New PIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* (Base styles copied from your setup) */
+        :root {
+            --primary-color: #00B3FF;
+            --background-start: #0A1128;
+            --background-end: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            min-height: 100vh;
+            color: #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-frame {
+            background-color: #F8F8F8;
+            border-radius: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .cta-button {
+            background:#233a45;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+        }
+        
+        /* 2. ADD ANIMATION KEYFRAMES AND CLASS */
+        @keyframes pulse-support {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pulse-support {
+            animation: pulse-support 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+        
+        <div class="flex justify-end mb-4 -mt-2">
+            <a href="https://twitter.com/AetherPaySupport" target="_blank" title="Customer Support"
+               class="text-blue-500 hover:text-blue-700 transition duration-150 animate-pulse-support">
+                <i class="fas fa-headset text-xl"></i>
+            </a>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Set Your 4-Digit PIN</h2>
+        <p id="message" class="text-gray-600 mb-8">Enter a new secure PIN for AetherPay.</p>
+
+        <div class="mb-10">
+            <input type="code" id="pin-input" class="w-full text-center text-3xl p-4 border-2 border-gray-300 rounded-xl tracking-[1rem]" maxlength="4" placeholder="••••">
+        </div>
+        
+        <button id="pin-set" class="cta-button w-full">
+            Set PIN and Continue
+        </button>
+
+        <p id="error-message" class="text-sm text-red-500 mt-6"></p>
+
+    </div>
+
+    <script>
+        const USER_PIN_KEY = 'aetherPayUserPIN';
+        const NEXT_PAGE_URL = 'pinsetup.html';
+
+        document.getElementById('pin-set').addEventListener('click', () => {
+            const pin = document.getElementById('pin-input').value;
+            const errorMessage = document.getElementById('error-message');
+
+            if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+                errorMessage.textContent = "PIN must be exactly 4 digits.";
+                return;
+            }
+
+            sessionStorage.setItem(USER_PIN_KEY, pin);
+            
+            // Redirect to the authorization page
+            window.location.href = NEXT_PAGE_URL;
+        });
+
+        // Optional: Pre-fill if a PIN is already set for testing purposes
+        if (sessionStorage.getItem(USER_PIN_KEY)) {
+             document.getElementById('message').textContent = "PIN already set. Click below to confirm or continue.";
+             // Note: In a real app, you wouldn't pre-fill a password field for security.
+             // We keep it here for mock-up simplicity.
+             document.getElementById('pin-input').value = sessionStorage.getItem(USER_PIN_KEY);
+        }
+    </script>
+</body>
+</html>

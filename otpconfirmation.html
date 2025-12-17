@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherPay - OTP Confirmation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #00B3FF;
+            --background-start: #0A1128;
+            --background-end: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            min-height: 100vh;
+            color: #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-frame {
+            background-color: #F8F8F8;
+            border-radius: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            text-align: center;
+        }
+        .cta-button {
+            background:#233a45;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+        }
+        .resend-button:disabled {
+            background: #D1D5DB; /* Gray for disabled state */
+            cursor: not-allowed;
+            color: #6B7280;
+        }
+        
+        /* 2. ADD ANIMATION KEYFRAMES AND CLASS */
+        @keyframes pulse-support {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-pulse-support {
+            animation: pulse-support 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-frame">
+        
+        <div class="flex justify-end mb-4 -mt-2">
+            <a href="https://twitter.com/AetherPaySupport" target="_blank" title="Customer Support"
+               class="text-blue-500 hover:text-blue-700 transition duration-150 animate-pulse-support">
+                <i class="fas fa-headset text-xl"></i>
+            </a>
+        </div>
+        <h2 class="text-3xl font-bold text-gray-800 mb-4">Confirm with OTP</h2>
+        <p class="text-gray-600 mb-8">A 6-digit code has been sent to your registered mobile number.</p>
+
+        <div class="mb-6">
+            <input type="code" id="otp-input" class="w-full text-center text-3xl p-4 border-2 border-gray-300 rounded-xl tracking-[1rem]" maxlength="6" placeholder="------">
+        </div>
+        
+        <p id="timer-message" class="text-sm text-gray-500 mb-6 font-semibold">Resend code in <span id="countdown-display" class="text-blue-600">30</span>s</p>
+
+        <button id="otp-submit" class="cta-button w-full mb-4">
+            Verify Code
+        </button>
+
+        <button id="resend-otp" class="resend-button w-full p-3 rounded-lg text-sm font-semibold" disabled>
+            Resend Code
+        </button>
+        
+        <p id="validation-message" class="text-sm mt-4"></p>
+
+    </div>
+
+    <script>
+        const TEMP_TRANSFER_KEY = 'aetherPayTempTransferData'; 
+        const OTP_EXPIRY_KEY = 'aetherPayOTPExpiry';
+        const MOCK_OTP_KEY = 'aetherPayMockOTP';
+
+        const countdownDisplay = document.getElementById('countdown-display');
+        const timerMessage = document.getElementById('timer-message');
+        const resendButton = document.getElementById('resend-otp');
+        const otpInput = document.getElementById('otp-input');
+        const submitButton = document.getElementById('otp-submit');
+        const validationMessage = document.getElementById('validation-message');
+
+        let countdownInterval;
+
+        // --- Core Functions ---
+
+        // Function to generate a new mock OTP and reset the timer
+        function generateAndSetNewOTP() {
+            // 1. Generate new OTP and reset expiry (simulating server action)
+            const newOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            const newExpiryTime = Date.now() + 30000; // Reset to 30 seconds
+
+            sessionStorage.setItem(MOCK_OTP_KEY, newOTP);
+            sessionStorage.setItem(OTP_EXPIRY_KEY, newExpiryTime.toString());
+            
+            console.log(`New Mock OTP Generated: ${newOTP}. Expires in 30s.`);
+            
+            // 2. Reset UI
+            resendButton.disabled = true;
+            resendButton.classList.remove('cta-button', 'text-white');
+            resendButton.classList.add('bg-gray-200', 'text-gray-600');
+            validationMessage.textContent = '';
+            
+            // 3. Restart countdown
+            startCountdown();
+            
+            // 4. Update timer message
+            timerMessage.innerHTML = `Resend code in <span id="countdown-display" class="text-blue-600">30</span>s`;
+            // Re-get the span element after re-setting innerHTML
+            document.getElementById('countdown-display').textContent = '30';
+        }
+
+        // Function to handle the countdown timer
+        function startCountdown() {
+            clearInterval(countdownInterval); // Clear any existing interval
+
+            const expiryTimestamp = parseInt(sessionStorage.getItem(OTP_EXPIRY_KEY), 10);
+            
+            if (isNaN(expiryTimestamp)) {
+                timerMessage.textContent = "Error: OTP data missing. Please start over.";
+                resendButton.disabled = false;
+                return;
+            }
+
+            const updateTimer = () => {
+                const now = Date.now();
+                const remaining = Math.max(0, expiryTimestamp - now);
+                const seconds = Math.floor(remaining / 1000);
+                
+                if (seconds > 0) {
+                    timerMessage.innerHTML = `Resend code in <span id="countdown-display" class="text-blue-600">${seconds}</span>s`;
+                } else {
+                    clearInterval(countdownInterval);
+                    timerMessage.textContent = "Code expired. Please resend or contact customer care.";
+                    resendButton.disabled = false;
+                    resendButton.classList.remove('bg-gray-200', 'text-gray-600');
+                    resendButton.classList.add('cta-button', 'text-white');
+                }
+            };
+
+            countdownInterval = setInterval(updateTimer, 1000);
+            updateTimer(); // Initial call to display immediately
+        }
+
+        // Function to validate the entered OTP
+        function validateOTP() {
+            const enteredOTP = otpInput.value;
+            const mockOTP = sessionStorage.getItem(MOCK_OTP_KEY);
+            const expiryTimestamp = parseInt(sessionStorage.getItem(OTP_EXPIRY_KEY), 10);
+            const now = Date.now();
+
+            validationMessage.classList.remove('text-red-500', 'text-green-500');
+            validationMessage.textContent = '';
+
+            if (enteredOTP.length !== 6) {
+                validationMessage.textContent = "Please enter the full 6-digit code.";
+                validationMessage.classList.add('text-red-500');
+                return;
+            }
+
+            if (now > expiryTimestamp) {
+                validationMessage.textContent = "Code expired! Please use the Resend button.";
+                validationMessage.classList.add('text-red-500');
+                return;
+            }
+            
+            if (enteredOTP === mockOTP) {
+                // SUCCESS LOGIC: Transfer is confirmed
+                validationMessage.textContent = "Verification successful! Processing transfer...";
+                validationMessage.classList.add('text-green-500');
+
+                // 1. In a real application, the final API call to execute the transfer goes here.
+                
+                // 2. Clean up session data
+                sessionStorage.removeItem(TEMP_TRANSFER_KEY);
+                sessionStorage.removeItem(MOCK_OTP_KEY);
+                sessionStorage.removeItem(OTP_EXPIRY_KEY);
+                sessionStorage.removeItem('aetherPayValidatedPIN');
+                clearInterval(countdownInterval);
+
+                // 3. Redirect to success page or wallet after a brief delay
+                setTimeout(() => {
+                    window.location.href = 'wallet.html'; // Assuming this is the main app page
+                }, 2000);
+            } else {
+                validationMessage.textContent = "Invalid code. Please try again or contact customer care.";
+                validationMessage.classList.add('text-red-500');
+            }
+        }
+
+        // --- Event Listeners and Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const transferData = sessionStorage.getItem(TEMP_TRANSFER_KEY);
+            
+            // Check if user should be on this page
+            if (!transferData) {
+                alert("Session expired or PIN step skipped. Redirecting.");
+                window.location.href = 'pin-setup.html'; // Redirect back to pin page
+                return;
+            }
+
+            // Start the countdown when the page loads
+            startCountdown();
+
+            submitButton.addEventListener('click', validateOTP);
+            
+            resendButton.addEventListener('click', () => {
+                // When resend is clicked, generate a new OTP and restart the process
+                generateAndSetNewOTP();
+                alert("A new code has been sent!, Contact customer-care if issue persist.");
+            });
+        });
+    </script>
+</body>
+</html>

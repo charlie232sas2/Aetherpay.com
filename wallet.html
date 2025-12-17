@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherPay - My Wallet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Define custom glassmorphism styles and transitions */
+        :root {
+            --primary-color: #00B3FF; /* Electric Teal/Blue */
+            --background-start: #0A1128;
+            --background-end: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Deep, dark gradient background */
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            min-height: 100vh;
+            color: #E5E7EB; /* Light gray text for contrast */
+            padding-bottom: 3rem; /* Space for mobile */
+        }
+        
+        .button{
+            /* Darker surface for cards and secondary elements */
+            background:#233a45; 
+        }
+        .glass-card {
+            /* CORRECTED: Removed background-color: white; which was causing issues with the dark UI. 
+               The original background color was already defined by the 'button' class or the main body.
+               I'll use a deep semi-transparent blue instead for a more consistent dark glass effect. */
+            background-color: white; /* Based on the .button color, but transparent */
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15); /* Light, subtle border */
+            box-shadow: 0 5px 30px 0 rgba(0, 0, 0, 0.4);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth motion */
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 179, 255, 0.4); /* Teal glow on hover */
+            box-shadow: 0 15px 50px 0 rgba(0, 0, 0, 0.6);
+            transform: translateY(-4px);
+        }
+
+        .cta-button {
+            /* Electric Teal/Blue gradient for CTAs */
+            background: linear-gradient(90deg, #0077B6 0%, var(--primary-color) 100%);
+            box-shadow: 0 4px 15px rgba(0, 179, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            box-shadow: 0 8px 25px rgba(0, 179, 255, 0.8);
+            transform: scale(1.03);
+        }
+
+        /* Custom scrollbar for premium feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A1128;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 179, 255, 0.5);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 179, 255, 0.8);
+        }
+        
+        /* Animation for deposit flash */
+        @keyframes depositFlash {
+            0% { background-color: rgba(0, 179, 255, 0.1); }
+            50% { background-color: rgba(0, 179, 255, 0.6); }
+            100% { background-color: rgba(35, 58, 69, 0.5); } /* Matching the .button/glass-card base */
+        }
+        .deposit-flash {
+            animation: depositFlash 1s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-7xl mx-auto px-4 py-8 md:py-12">
+
+        <header class="flex justify-between items-center mb-6">
+            <div class="flex items-center text-3xl font-bold text-white tracking-wider">
+                <i data-lucide="zap" class="w-7 h-7 mr-2 text-primary-color"></i>
+                Aether<span class="font-light text-primary-color">Pay</span>
+            </div>
+            
+            <div class="relative">
+                <button onclick="toggleMenu()" class="flex items-center space-x-3 p-2 rounded-full button hover: border-white">
+                    <i data-lucide="bell" class="w-5 h-5 text-gray-300"></i>
+                    <div id="user-initials" class="w-8 h-8 rounded-full bg-primary-color flex items-center justify-center text-sm font-semibold">
+                    </div>
+                </button>
+
+                <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-gray-900 glass-card rounded-lg shadow-xl z-10 hidden">
+                    <p id="menu-greeting" class="p-3 text-sm font-semibold text-primary-color border-b border-gray-700">Hello, Client!</p>
+                    <a href="#" class="flex items-center p-3 text-sm hover:bg-gray-700 rounded-t-lg transition">
+                        <i data-lucide="user" class="w-4 h-4 mr-2"></i> Client Information
+                    </a>
+                    <a href="#" class="flex items-center p-3 text-sm hover:bg-gray-700 transition">
+                        <i data-lucide="settings" class="w-4 h-4 mr-2"></i> Settings
+                    </a>
+                    <a href="javascript:void(0)" onclick="logout()" class="flex items-center p-3 text-sm text-red-400 hover:bg-gray-700 rounded-b-lg transition">
+                        <i data-lucide="log-out" class="w-4 h-4 mr-2"></i> Sign Out
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <h1 id="welcome-greeting" class="text-1xl md:text-1l font-bold text-white mb-8">
+            Welcome, Client!
+        </h1>
+
+
+        <section class="mb-12">
+            <div id="main-balance-card" class="glass-card p-6 md:p-10 rounded-3xl text-center">
+                <p class="text-xl text-gray-400 font-medium mb-3">Total Portfolio Value </p>
+                <h1 id="total-balance" class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-black mb-6 transition-all duration-500">
+                    $0.00
+                </h1>
+
+                <div class="flex justify-center space-x-4 md:space-x-8 mt-6">
+                    <a href="sendfundstep1.html" class="flex flex-col items-center p-3 sm:p-4 rounded-xl button hover:bg-primary-color/10 text-white transition duration-300 w-24 sm:w-32">
+                        <i data-lucide="send" class="w-6 h-6 sm:w-8 sm:h-8 text-white mb-1"></i>
+                        <span class="text-sm font-semibold mt-1">Send</span>
+                    </a>
+                    <a href="receivefunds.html" class="flex flex-col items-center p-3 sm:p-4 rounded-xl button hover:bg-primary-color/10 text-white transition duration-300 w-24 sm:w-32">
+                        <i data-lucide="inbox" class="w-6 h-6 sm:w-8 sm:h-8 text-primary-color mb-1"></i>
+                        <span class="text-sm font-semibold mt-1">Receive</span>
+                    </a>
+                    
+                </div>
+            </div>
+        </section>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+
+            <div class="lg:col-span-2">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <i data-lucide="wallet-2" class="w-6 h-6 mr-3 text-primary-color"></i>
+                    Your Global Wallets
+                </h2>
+
+                <div id="wallets-list" class="space-y-4 ">
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
+                    <i data-lucide="activity" class="w-6 h-6 mr-3 text-white"></i>
+                    Recent Activity
+                </h2>
+
+                <div class="button p-4 rounded-2xl">
+                    <div id="transactions-list" class="space-y-4">
+    <div id="deposit-transaction" class="hidden flex justify-between items-center pb-2 border-b border-white">
+        <div class="flex items-center space-x-3">
+            <div class="p-2 rounded-full bg-green-600/20 text-green-400">
+                <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
+            </div>
+            <div>
+                <p class="font-semibold text-sm text-white">Corporate Treasury Deposit</p>
+                <p class="text-xs text-gray-400">Today</p>
+            </div>
+        </div>
+        <div class="text-right">
+            <p class="text-sm font-bold text-green-400">+$8,236,000.00</p>
+            <p class="text-xs text-gray-500">USD Equivalent</p>
+        </div>
+    </div>
+</div>
+
+
+                         
+                    <button class="w-full mt-6 py-2 rounded-xl border border-primary-color/50 text-primary-color hover:bg-primary-color/10 transition duration-300 text-sm font-medium">
+                        View All History
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // --- Configuration & Data ---
+    const CLIENT_KEY = 'aetherPayClientName';
+    const getDepositKey = (clientName) => `depositComplete_${clientName.replace(/\s/g, '_')}`;
+    const baseCurrency = 'USD';
+    const clientFullName = localStorage.getItem(CLIENT_KEY) || 'Guest';
+    const clientFirstName = clientFullName.split(' ')[0] || 'Client';
+    const DEPOSIT_KEY = getDepositKey(clientFullName);
+
+    const targetWallet = {
+        USD: { balance: 4520000.00, symbol: '$', icon: 'dollar-sign', color: 'text-green-400', page: 'usdvirtualcard.html' },
+        EUR: { balance: 2900000.00, symbol: '€', icon: 'euro', color: 'text-blue-400', page: 'eurvirtualcard.html' },
+        GBP: { balance: 650000.00, symbol: '£', icon: 'pound-sterling', color: 'text-red-400', page: 'gbpvirtualcard.html' },
+        JPY: { balance: 116000, symbol: '¥', icon: 'yen', color: 'text-yellow-400', page: 'jpyvirtualcard.html' }
+    };
+
+    const initialWallet = {
+        USD: { balance: 0.00, symbol: '$', icon: 'dollar-sign', color: 'text-green-400', page: 'usdvirtualcard.html' },
+        EUR: { balance: 0.00, symbol: '€', icon: 'euro', color: 'text-blue-400', page: 'eurvirtualcard.html' },
+        GBP: { balance: 0.00, symbol: '£', icon: 'pound-sterling', color: 'text-red-400', page: 'gbpvirtualcard.html' },
+        JPY: { balance: 0, symbol: '¥', icon: 'yen', color: 'text-yellow-400', page: 'jpyvirtualcard.html' }
+    };
+
+    let currentWallet = (localStorage.getItem(DEPOSIT_KEY) === 'true') ? targetWallet : initialWallet;
+
+    function calculateTotalBalance(walletData) {
+        if (localStorage.getItem(DEPOSIT_KEY) === 'true') {
+             return 8236000.00;
+        } else {
+             return 0.00; 
+        }
+    }
+
+    function renderWallets() {
+        currentWallet = (localStorage.getItem(DEPOSIT_KEY) === 'true') ? targetWallet : initialWallet;
+        const walletsListElement = document.getElementById('wallets-list');
+        walletsListElement.innerHTML = '';
+
+        for (const code in currentWallet) {
+            const wallet = currentWallet[code];
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: code,
+                minimumFractionDigits: code === 'JPY' ? 0 : 2,
+            });
+            const formattedBalance = formatter.format(wallet.balance);
+            const cardHref = wallet.page;
+
+            const walletHtml = `
+                <a href="${cardHref}" class="wallet-card button p-5 rounded-2xl flex justify-between items-center hover:shadow-xl hover:translate-y-0 transition duration-300 cursor-pointer hover:border-primary-color/50">
+                    <div class="flex items-center space-x-4">
+                        <div class="p-3 rounded-full bg-gray-900/50 ${wallet.color} flex items-center justify-center">
+                            <i data-lucide="${wallet.icon}" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <p class="text-xl font-bold text-white">${code} Wallet</p>
+                            <p class="text-sm text-gray-400">Available Balance</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-extrabold text-white">${formattedBalance}</p>
+                        <p class="text-primary-color text-xs font-semibold mt-1">View Virtual Card</p>
+                    </div>
+                </a>
+            `;
+            walletsListElement.innerHTML += walletHtml;
+        }
+        lucide.createIcons();
+    }
+
+    function renderTotalBalance() {
+        const total = calculateTotalBalance(currentWallet);
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: baseCurrency,
+            minimumFractionDigits: 2,
+        });
+        document.getElementById('total-balance').textContent = formatter.format(total);
+    }
+    
+    function renderClientHeader() {
+        const initials = clientFullName.split(' ').map(n => n[0]).join('').toUpperCase() || '??';
+        document.getElementById('user-initials').textContent = initials;
+        document.getElementById('welcome-greeting').textContent = `Welcome, ${clientFirstName}!`;
+        document.getElementById('menu-greeting').textContent = `Hello, ${clientFirstName}!`;
+    }
+
+    function toggleMenu() {
+        document.getElementById('user-menu').classList.toggle('hidden');
+    }
+    
+    function logout() {
+         window.location.href = 'auth.html';
+    }
+
+    /**
+     * UPDATED: Controls the visibility of the history item
+     */
+    function showDepositTransaction(animate = false) {
+        const depositTransactionContainer = document.getElementById('deposit-transaction');
+        const mainBalanceCard = document.getElementById('main-balance-card');
+
+        if (depositTransactionContainer) {
+            if (localStorage.getItem(DEPOSIT_KEY) === 'true') {
+                depositTransactionContainer.classList.remove('hidden'); // SHOW HISTORY
+            } else {
+                depositTransactionContainer.classList.add('hidden'); // HIDE HISTORY
+            }
+            
+            if (animate) {
+                mainBalanceCard.classList.add('deposit-flash');
+                setTimeout(() => {
+                    mainBalanceCard.classList.remove('deposit-flash');
+                }, 1000);
+            }
+        }
+    }
+
+    /**
+     * UPDATED: Set to 2 hours (7200 seconds)
+     */
+    function simulateDeposit() {
+        if (localStorage.getItem(DEPOSIT_KEY) !== 'true') {
+            const delayInSeconds = 7200; // 2 HOURS
+            let timer = delayInSeconds;
+            const balanceElement = document.getElementById('total-balance');
+            
+            const countdownInterval = setInterval(() => {
+                if (timer > 0) {
+                    // Optional: You can show the timer here or just keep $0.00
+                    balanceElement.textContent = `$0.00`; 
+                    timer--;
+                } else {
+                    clearInterval(countdownInterval);
+                    currentWallet = targetWallet;
+                    localStorage.setItem(DEPOSIT_KEY, 'true');
+                    
+                    renderTotalBalance();
+                    renderWallets();
+                    showDepositTransaction(true); // REVEALS THE RECENT ACTIVITY ITEM
+                }
+            }, 1000);
+        }
+    }
+
+    window.onload = function() {
+        if (clientFullName === 'Guest' || !localStorage.getItem('aetherPayCredentials')) {
+            window.location.href = 'auth.html';
+            return;
+        }
+        
+        renderClientHeader();
+        renderTotalBalance(); 
+        renderWallets();
+        showDepositTransaction(false); 
+        
+        if (localStorage.getItem(DEPOSIT_KEY) !== 'true') {
+            simulateDeposit(); 
+        }
+    }
+    
+    document.addEventListener('click', function(event) {
+        const menu = document.getElementById('user-menu');
+        const button = document.querySelector('.relative > button');
+        if (menu && button && !button.contains(event.target) && !menu.contains(event.target)) {
+            menu.classList.add('hidden');
+        }
+    });
+</script>
+
+
+
+</body>
+</html>

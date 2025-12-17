@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherPay - Send Funds (Step 1)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary-color: #00B3FF;
+            --secondary-color: #0077B6;
+            --background-start: #0A1128;
+            --background-end: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            /* Set height to 100% of the viewport height on large devices */
+            min-height: 100vh; 
+            color: #E5E7EB;
+        }
+
+        /* Styling the inner content container to mimic the mobile frame */
+        .mobile-frame {
+            border-radius: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            /* Ensure the frame takes up available vertical space */
+            min-height: calc(100vh - 8rem); /* Adjusted min-height to utilize more screen space on large devices */
+            min-width: 0;
+            overflow: hidden;
+        }
+        
+        /* Header background */
+        .header-bg {
+            background-color: #121930;
+            border-top-left-radius: 2rem;
+            border-top-right-radius: 2rem;
+        }
+ .button{
+            background:#233a45;
+        }
+        .cta-button {
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            box-shadow: 0 4px 15px rgba(0, 179, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            box-shadow: 0 8px 25px rgba(0, 179, 255, 0.8);
+            transform: scale(1.01);
+        }
+
+        /* Input styling for the WHITE background */
+        .form-input-light {
+            background-color: #FFFFFF;
+            border-color: #D1D5DB;
+            color: #1F2937;
+            transition: border-color 0.2s, box-shadow 0.2s; 
+        }
+        .form-input-light:focus {
+            background-color: #FFFFFF; 
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 179, 255, 0.3); 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-xl mx-auto py-4 sm:py-12 lg:py-20 px-4 sm:px-6 h-full flex flex-col justify-center">
+        <div class="mobile-frame">
+
+            <header class="header-bg p-4 sm:p-6 pb-20">
+                <div class="flex items-center space-x-3">
+                    <a href="wallet.html" class="p-2 rounded-full bg-gray-700/50 hover:bg-gray-700">
+                        <i data-lucide="arrow-left" class="w-5 h-5 text-gray-300"></i>
+                    </a>
+                    <h1 class="text-xl font-bold text-white">
+                        1. Transfer To Bank Account 
+                    </h1>
+                </div>
+            </header>
+            
+            <div class="p-4 sm:p-6 -mt-16 bg-white rounded-t-3xl h-full">
+
+                <form id="details-form" class="h-full flex flex-col">
+
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4">Who are you sending money to?</h2>
+                    
+                    <div class="space-y-6 mb-8 flex-grow"> 
+                        
+                        <div>
+                            <label for="recipient-name" class="block text-sm font-medium text-gray-500 mb-2">Account Name</label>
+                            <input type="text" id="recipient-name" class="form-input-light w-full p-3 rounded-xl border focus:ring" >
+                        </div>
+
+                        <div>
+                            <label for="recipient-bank" class="block text-sm font-medium text-gray-500 mb-2"> Bank Name</label>
+                            <input type="text" id="recipient-bank" class="form-input-light w-full p-3 rounded-xl border focus:ring" >
+                        </div>
+
+                        <div>
+                            <label for="recipient-id" class="block text-sm font-medium text-gray-500 mb-2">Account Number / IBAN / AetherPay ID</label>
+                            <input type="number" id="recipient-id" class="form-input-light w-full p-3 rounded-xl border focus:ring" >
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-4 border-t border-gray-100">
+                        <div id="validation-message" class="hidden p-3 mb-4 rounded-lg text-center bg-red-100 text-red-600 border border-red-300 text-sm font-medium">
+                            Please fill in all Account details: Name, Bank, and Account Number.
+                        </div>
+
+                        <button type="button" id="proceed-button" onclick="handleProceed()" class="button w-full py-4 rounded-xl text-lg font-bold text-white flex items-center justify-center space-x-2">
+                            <span> NEXT</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // --- Configuration & Global Data ---
+        const TEMP_TRANSFER_KEY = 'aetherPayTempTransferData'; // Key for sessionStorage
+        
+        /**
+         * Handles the "Proceed" button click: Saves recipient data and navigates.
+         */
+        function handleProceed() {
+            const recipientName = document.getElementById('recipient-name').value.trim();
+            const recipientBank = document.getElementById('recipient-bank').value.trim();
+            const recipientId = document.getElementById('recipient-id').value.trim();
+            const validationMessage = document.getElementById('validation-message');
+
+            // 1. Validation
+            if (!recipientName || !recipientBank || !recipientId) {
+                validationMessage.classList.remove('hidden');
+                return;
+            } else {
+                validationMessage.classList.add('hidden');
+            }
+
+            // 2. Load existing data or initialize a new object
+            let transferData = JSON.parse(sessionStorage.getItem(TEMP_TRANSFER_KEY)) || {};
+
+            // 3. Update transfer data with recipient details
+            transferData.recipientName = recipientName;
+            transferData.recipientBank = recipientBank;
+            transferData.recipientId = recipientId;
+
+            // 4. Save transfer data to sessionStorage for the next page
+            sessionStorage.setItem(TEMP_TRANSFER_KEY, JSON.stringify(transferData));
+
+            // 5. Navigate to the next step
+            window.location.href = 'sendfundstep2.html';
+        }
+
+        // --- Initial Load Setup ---
+        window.onload = function() {
+            // Pre-fill form if data exists (for back-navigation)
+            let transferData = JSON.parse(sessionStorage.getItem(TEMP_TRANSFER_KEY));
+            if (transferData) {
+                document.getElementById('recipient-name').value = transferData.recipientName || '';
+                document.getElementById('recipient-bank').value = transferData.recipientBank || '';
+                document.getElementById('recipient-id').value = transferData.recipientId || '';
+            }
+        }
+    </script>
+
+</body>
+</html>

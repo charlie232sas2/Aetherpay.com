@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">AetherPay - Secure Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary-color: #00B3FF;
+            --secondary-color: #0077B6;
+            --background-start: #0A1128;
+            --background-end: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            min-height: 100vh;
+            color: black;
+        }
+
+        .mobile-frame {
+            background-color: white; 
+            border-radius: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            /* Set a fixed height for a smoother transition */
+            height: auto; 
+            min-height: 600px;
+            transition: height 0.3s ease-in-out; 
+            overflow: hidden; /* Hide the form that isn't visible */
+        }
+
+        .cta-button {
+             
+            background:#233a45;
+            box-shadow: 0 4px 15px rgba(0, 179, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            box-shadow: 0 8px 25px #3f2f3ae6;
+            transform: scale(1.01);
+        }
+
+        /* Input styling */
+        .form-input {
+            background-color: white;
+            border: 1px solid rgba(0, 179, 255, 0.3);
+            color: black;
+        }
+        .form-input:focus {
+            background-color: white; 
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 179, 255, 0.5);
+        }
+
+        /* Custom Transition Classes for seamless switching */
+        .form-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .hidden-form {
+            opacity: 0;
+            transform: translateX(100%);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .visible-form {
+            opacity: 1;
+            transform: translateX(0);
+            position: relative;
+            visibility: visible;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="max-w-md mx-auto py-8 md:py-12 flex items-center justify-center min-h-screen">
+        <div id="auth-container" class="mobile-frame w-full p-6 sm:p-8 md:p-10 relative">
+
+            <header class="text-center mb-10">
+                <div class="flex items-center justify-center space-x-2 text-4xl font-extrabold text-white">
+                    <i data-lucide="zap" class="w-8 h-8 text-primary-color"></i>
+                    <span>Aether<span class="text-primary-color">Pay</span></span>
+                </div>
+                <h2 id="auth-header" class="text-2xl font-semibold mt-4">Welcome Back</h2>
+                <p id="auth-subheader" class="text-black text-sm">Please sign in to access your dashboard.</p>
+            </header>
+
+            <div id="login-view" class="form-transition visible-form px-4 pb-4">
+                <form id="login-form">
+                    <div class="space-y-6 mb-8">
+                        <div>
+                            <label for="username" class="block text-sm font-medium text-black mb-2">Email</label>
+                            <input type="text" id="username" class="form-input w-full p-4 rounded-xl focus:ring" placeholder="Enter your registered email or username">
+                        </div>
+
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-black mb-2">Password</label>
+                            <div class="relative">
+                                <input type="password" id="password" class="form-input w-full p-4 rounded-xl pr-12 focus:ring" placeholder="Enter your password">
+                                <button type="button" onclick="togglePasswordVisibility('password', 'toggle-icon-login')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-black">
+                                    <i id="toggle-icon-login" data-lucide="eye" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end mb-8">
+                        <a href="javascript:void(0)" onclick="alert('Password reset link sent to your email.')" class="text-sm font-medium text-primary-color hover:text-white transition duration-200">
+                            Forgot Password?
+                        </a>
+                    </div>
+
+                    <div id="login-error" class="text-center text-red-400 text-sm mb-4 hidden"></div>
+
+                    <button type="button" onclick="handleLogin()" class="cta-button w-full py-4 rounded-xl text-white font-bold">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="text-center mt-8 text-sm">
+                    <p class="text-gray-400">Don't have an account?</p>
+                    <a href="javascript:void(0)" onclick="toggleView('signup')" class="text-primary-color font-semibold hover:text-white transition duration-200">
+                        Create an account
+                    </a>
+                </div>
+            </div>
+
+            <div id="signup-view" class="form-transition hidden-form px-4 pb-4">
+                <form id="signup-form">
+                    <div class="space-y-5 mb-8">
+                        <div>
+                            <label for="fullname" class="block text-sm font-medium text-black mb-2">Full Name</label>
+                            <input type="text" id="fullname" class="form-input w-full p-4 rounded-xl focus:ring" placeholder="Enter your full name">
+                        </div>
+
+                        <div>
+                            <label for="signup-email" class="block text-sm font-medium text-black mb-2">Email Address</label>
+                            <input type="email" id="signup-email" class="form-input w-full p-4 rounded-xl focus:ring" placeholder="Enter your email address">
+                        </div>
+                        
+                        <div>
+                            <label for="phone-number" class="block text-sm font-medium text-black mb-2">Phone Number</label>
+                            <input type="tel" id="phone-number" class="form-input w-full p-4 rounded-xl focus:ring" placeholder="Enter your phone number (e.g., +1 555-123-4567)">
+                        </div>
+
+                        <div>
+                            <label for="signup-password" class="block text-sm font-medium text-black mb-2">Password</label>
+                            <div class="relative">
+                                <input type="password" id="signup-password" class="form-input w-full p-4 rounded-xl pr-12 focus:ring" placeholder="Create a strong password">
+                                <button type="button" onclick="togglePasswordVisibility('signup-password', 'toggle-icon-signup')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-black">
+                                    <i id="toggle-icon-signup" data-lucide="eye" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-medium text-black mb-2">Confirm Password</label>
+                            <input type="password" id="confirm-password" class="form-input w-full p-4 rounded-xl focus:ring" placeholder="Re-enter password">
+                        </div>
+                    </div>
+
+                    <div id="signup-error" class="text-center text-red-400 text-sm mb-4 hidden"></div>
+
+                    <button type="button" onclick="handleSignup()" class="cta-button w-full py-4 rounded-xl text-white font-bold">
+                        Register
+                    </button>
+                </form>
+                
+                <div class="text-center mt-8 text-sm">
+                    <p class="text-gray-400">Already have an account?</p>
+                    <a href="javascript:void(0)" onclick="toggleView('login')" class="text-primary-color font-semibold hover:text-white transition duration-200">
+                        Sign In
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-8 rounded-xl w-full max-w-sm text-center shadow-2xl">
+            <i data-lucide="check-circle" class="w-12 h-12 mx-auto mb-4 text-primary-color"></i>
+            <h3 class="text-2xl font-bold text-gray-800 mb-3">Registration Successful!</h3>
+            <p id="success-message" class="text-gray-600 mb-6">Your account is created. Please sign in.</p>
+            <button onclick="closeSuccessModal()" class="cta-button py-2 px-6 rounded-lg font-semibold block w-full">Go to Login</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+        
+        // --- Keys for Local Storage Simulation ---
+        const DEPOSIT_KEY = 'aetherPayDepositComplete'; 
+        const CLIENT_KEY = 'aetherPayClientName'; 
+        const USER_CREDENTIALS_KEY = 'aetherPayCredentials'; 
+
+        /**
+         * Toggles the visibility of the password field.
+         */
+        function togglePasswordVisibility(fieldId, iconId) {
+            const passwordField = document.getElementById(fieldId);
+            const toggleIcon = document.getElementById(iconId);
+            
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordField.type = 'password';
+                toggleIcon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        /**
+         * Toggles between Login and Sign Up views.
+         */
+        function toggleView(view) {
+            const loginView = document.getElementById('login-view');
+            const signupView = document.getElementById('signup-view');
+            const header = document.getElementById('auth-header');
+            const subheader = document.getElementById('auth-subheader');
+            const pageTitle = document.getElementById('page-title');
+            
+            // Clear errors and forms when switching views
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('signup-error').classList.add('hidden');
+            document.getElementById('login-form').reset();
+            document.getElementById('signup-form').reset();
+
+            if (view === 'signup') {
+                loginView.classList.remove('visible-form');
+                loginView.classList.add('hidden-form');
+                signupView.classList.remove('hidden-form');
+                signupView.classList.add('visible-form');
+                
+                header.textContent = 'Create Your Account';
+                subheader.textContent = 'Join AetherPay and manage your global finances.';
+                pageTitle.textContent = 'AetherPay - Sign Up';
+            } else {
+                signupView.classList.remove('visible-form');
+                signupView.classList.add('hidden-form');
+                loginView.classList.remove('hidden-form');
+                loginView.classList.add('visible-form');
+
+                header.textContent = 'Welcome Back';
+                subheader.textContent = 'Please sign in to access your dashboard.';
+                pageTitle.textContent = 'AetherPay - Secure Login';
+            }
+        }
+        
+        /**
+         * Handles the sign up attempt, validates fields, and simulates registration.
+         */
+        function handleSignup() {
+            const fullName = document.getElementById('fullname').value.trim();
+            const email = document.getElementById('signup-email').value.trim().toLowerCase();
+            const phoneNumber = document.getElementById('phone-number').value.trim(); // NEW
+            const password = document.getElementById('signup-password').value.trim();
+            const confirmPassword = document.getElementById('confirm-password').value.trim();
+            const errorEl = document.getElementById('signup-error');
+            
+            errorEl.classList.add('hidden'); 
+
+            // 1. Validation
+            if (!fullName || !email || !phoneNumber || !password || !confirmPassword) { // Updated to include phone number
+                errorEl.textContent = 'All fields are required.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            if (password.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters long.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            if (password !== confirmPassword) {
+                errorEl.textContent = 'Passwords do not match.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            // 2. Simulated Registration Success
+            
+            // Store the full name
+            localStorage.setItem(CLIENT_KEY, fullName);
+            
+            // STORE THE SPECIFIC CREDENTIALS (MIMICS FIREBASE/DB WRITE) - Now storing phone number too
+            const userCredentials = {
+                usernameOrEmail: email,
+                phoneNumber: phoneNumber, // Stored phone number
+                passwordHash: password 
+            };
+            localStorage.setItem(USER_CREDENTIALS_KEY, JSON.stringify(userCredentials));
+            
+            // Show success modal
+            document.getElementById('success-message').innerHTML = `Welcome, **${fullName}**! Your account is created. Please sign in with your **Email** and **Password** details.`;
+            document.getElementById('success-modal').classList.remove('hidden');
+        }
+        
+        /**
+         * Closes the success modal and switches to the login view.
+         */
+        function closeSuccessModal() {
+            document.getElementById('success-modal').classList.add('hidden');
+            document.getElementById('signup-form').reset();
+            toggleView('login');
+        }
+
+        /**
+         * Simulates a login attempt by checking input details against stored details.
+         */
+        function handleLogin() {
+            const usernameInput = document.getElementById('username').value.trim().toLowerCase();
+            const passwordInput = document.getElementById('password').value.trim();
+            const errorEl = document.getElementById('login-error');
+
+            if (!usernameInput || !passwordInput) {
+                errorEl.textContent = 'Please enter both username/email and password.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            // 1. Retrieve stored credentials
+            const storedCredentialsJSON = localStorage.getItem(USER_CREDENTIALS_KEY);
+            
+            if (!storedCredentialsJSON) {
+                // No user has ever registered
+                errorEl.textContent = 'No registered accounts found. Please create an account first.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+            
+            const storedCredentials = JSON.parse(storedCredentialsJSON);
+
+            // 2. Validate input against stored credentials
+            // User can sign in with either their registered email or (simulated) phone number. 
+            // Since the input field is labeled 'Email or Username', we'll only check email/username.
+            const usernameMatch = storedCredentials.usernameOrEmail === usernameInput; 
+            const passwordMatch = storedCredentials.passwordHash === passwordInput;
+            
+            if (!usernameMatch || !passwordMatch) {
+                errorEl.textContent = 'Invalid username/email or password.';
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            // --- AUTHENTICATION SUCCESS LOGIC ---
+            
+            // 1. Hide any previous errors
+            errorEl.classList.add('hidden');
+            
+            // 2. Initialize deposit state if it's the first time
+            if (localStorage.getItem(DEPOSIT_KEY) === null) {
+                localStorage.setItem(DEPOSIT_KEY, 'false');
+            }
+            
+            // 3. Redirect to the main wallet page
+            window.location.href = 'wallet.html';
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherPay - Send Funds (Step 2)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary-color: #00B3FF;
+            --secondary-color: #0077B6;
+            --background-start: #0A1128;
+            --background-end: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            min-height: 100vh;
+            color: #E5E7EB;
+        }
+         .button{
+            background:#233a45;
+        }
+
+        .mobile-frame {
+            border-radius: 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            min-height: calc(100vh - 8rem);
+            overflow: hidden; 
+        }
+
+        .header-bg {
+            background-color: #121930;
+            border-top-left-radius: 2rem;
+            border-top-right-radius: 2rem;
+        }
+
+        .cta-button {
+         
+            background:#233a45;
+        };
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 179, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            box-shadow: 0 8px 25px rgba(0, 179, 255, 0.8);
+            transform: scale(1.01);
+        }
+
+        .amount-input-group {
+            border-bottom: 2px solid #D1D5DB; 
+        }
+        .amount-input {
+            background: transparent;
+            color: #1F2937;
+            border: none;
+            text-align: left;
+            font-weight: 700;
+            outline: none;
+            width: 100%;
+        }
+        .amount-input:focus {
+            border-bottom-color: var(--primary-color);
+        }
+
+        .quick-amount-btn {
+            background-color: #E5E7EB;
+            color: #4B5563;
+            border: 1px solid #D1D5DB;
+            transition: all 0.2s ease;
+        }
+        .quick-amount-btn:hover, .quick-amount-btn.active {
+            
+            background:#233a45;
+       
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .remark-btn {
+            background-color: #E5E7EB;
+            color: #4B5563;
+            transition: all 0.2s ease;
+        }
+        .remark-btn.active {
+           
+            background:#233a45;
+            color: white;
+        }
+        
+        /* Input styling for the modal's white background */
+        .form-select-light {
+            background-color: #FFFFFF;
+            border-color: #D1D5DB;
+            color: #1F2937;
+        }
+        .form-select-light:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 179, 255, 0.3);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="max-w-xl mx-auto py-4 sm:py-12 lg:py-20 px-4 sm:px-6 h-full flex flex-col justify-center">
+        <div class="mobile-frame">
+
+            <header class="header-bg p-4 sm:p-6 pb-20">
+                <div class="flex items-center space-x-3">
+                    <a href="sendfundstep1.html" class="p-2 rounded-full bg-gray-700/50 hover:bg-gray-700">
+                        <i data-lucide="arrow-left" class="w-5 h-5 text-gray-300"></i>
+                    </a>
+                    <h1 class="text-xl font-bold text-white">
+                        Transfer Details
+                    </h1>
+                </div>
+            </header>
+            
+            <div class="p-4 sm:p-6 -mt-16 bg-white rounded-t-3xl h-full flex flex-col">
+
+                <div id="recipient-header" class="mb-8">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="p-3 rounded-full bg-primary-color/20 text-primary-color">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </div>
+                        <p class="text-lg font-semibold text-gray-800" id="preview-name">Recipient Name</p>
+                    </div>
+                    <p class="text-sm text-gray-600 ml-11" id="preview-id-bank">123456789 | Bank Name</p>
+                </div>
+
+                <form id="transfer-form" class="flex flex-col flex-grow">
+
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-sm font-medium text-gray-500">Amount (To Send)</h2>
+                        <button type="button" onclick="openCurrencyModal()" class="text-black hover:text-secondary-color transition-colors flex items-center space-x-1 text-sm font-medium">
+                            <i data-lucide="chevrons-up-down" class="w-4 h-4"></i>
+                            <span>Edit Currencies</span>
+                        </button>
+                    </div>
+
+                    <div class="amount-input-group flex items-center mb-6 py-2">
+                        <span id="source-symbol-prefix" class="text-2xl font-bold text-gray-800 mr-2">$</span>
+                        <input type="number" id="amount" class="amount-input text-3xl md:text-4xl" placeholder="0.00" min="0.01" step="any" oninput="updateCalculations()">
+                        <span id="amount-unit" class="text-xl font-semibold text-gray-400 select-none">USD</span>
+                    </div>
+
+                    <div id="quick-amounts-container" class="grid grid-cols-3 gap-3 mb-8">
+                        </div>
+
+                    <h2 class="text-sm font-medium text-gray-500 mb-2">Remark</h2>
+                    <div class="flex space-x-3 mb-8">
+                        <button type="button" class="remark-btn py-2 px-4 rounded-lg text-sm flex-grow active" data-remark="Personal">Personal</button>
+                        <button type="button" class="remark-btn py-2 px-4 rounded-lg text-sm flex-grow" data-remark="Purchase">Purchase</button>
+                    </div>
+                    
+                    <div id="summary-area" class="space-y-3 text-sm text-gray-700 mt-auto hidden"> 
+                        <div class="flex justify-between items-center">
+                            <span>Total Cost (incl. fee):</span>
+                            <span id="total-cost" class="font-bold">0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Recipient Receives:</span>
+                            <span id="recipient-receives" class="font-bold text-green-600">0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs text-red-500">
+                            <span>Transfer Fee (0.5%):</span>
+                            <span id="transfer-fee" class="font-medium">0.00</span>
+                        </div>
+                        <p id="validation-error" class="text-center text-red-500 text-xs mt-3 hidden">Insufficient balance for this transfer.</p>
+                    </div>
+
+                    <button type="button" id="confirm-button" onclick="handleConfirm()" class="cta-button w-full py-4 rounded-xl text-lg font-bold mt-4 opacity-50 cursor-not-allowed" disabled>
+                        Confirm
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="currency-modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 sm:p-8 rounded-xl w-full max-w-sm text-left shadow-2xl">
+            <h3 class="text-xl font-bold text-gray-800 mb-6 flex justify-between items-center">
+                Select Currencies
+                <button onclick="closeCurrencyModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </h3>
+
+            <div class="space-y-6 mb-8">
+                <div>
+                    <label for="modal-source-currency" class="block text-sm font-medium text-gray-500 mb-2">You Send (Source)</label>
+                    <select id="modal-source-currency" class="form-select-light w-full p-3 rounded-xl border focus:ring"></select>
+                </div>
+                <div>
+                    <label for="modal-target-currency" class="block text-sm font-medium text-gray-500 mb-2">Recipient Receives (Target)</label>
+                    <select id="modal-target-currency" class="form-select-light w-full p-3 rounded-xl border focus:ring"></select>
+                </div>
+            </div>
+
+            <button onclick="applyCurrencyChanges()" class="cta-button w-full py-3 rounded-xl font-bold">
+                Apply Changes
+            </button>
+        </div>
+    </div>
+    <script>
+        lucide.createIcons();
+
+        // --- Configuration & Global Data ---
+        const WALLET_KEY = 'aetherPayCurrentWallet';
+        const TEMP_TRANSFER_KEY = 'aetherPayTempTransferData'; 
+        const FEE_PERCENTAGE = 0.005; 
+        
+        // Define currency symbols and quick amounts
+        const CURRENCY_CONFIG = {
+            'USD': { symbol: '$', amounts: [100, 500, 1000, 2500, 5000, 10000], name: 'US Dollar' },
+            'EUR': { symbol: '€', amounts: [100, 400, 800, 2000, 4000, 8000], name: 'Euro' },
+            'GBP': { symbol: '£', amounts: [50, 200, 500, 1500, 3000, 5000], name: 'British Pound' },
+            'JPY': { symbol: '¥', amounts: [10000, 50000, 100000, 500000, 1000000, 2000000], name: 'Japanese Yen' }
+        };
+        const ALL_CURRENCIES = Object.keys(CURRENCY_CONFIG);
+
+
+        const initialWallet = { 'USD': { balance: 0.00, symbol: '$' }, 'EUR': { balance: 0.00, symbol: '€' } };
+        const targetWalletData = { 'USD': { balance: 4520000.00, symbol: '$' }, 'EUR': { balance: 2900000.00, symbol: '€' }, 'GBP': { balance: 650000.00, symbol: '£' }, 'JPY': { balance: 50000000, symbol: '¥' } };
+        // Conversion rates are relative to USD (1 USD = X of this currency)
+        const usdConversionRates = { 'USD': 1.0, 'EUR': 1.085, 'GBP': 1.25, 'JPY': 0.0068 };
+
+        let currentWallet = {};
+        let transferData = {}; 
+        
+        /** Loads the current wallet state from localStorage. */
+        function loadWalletState() {
+            const depositComplete = localStorage.getItem('aetherPayDepositComplete') === 'true';
+            const savedWallet = localStorage.getItem(WALLET_KEY);
+            
+            if (savedWallet) {
+                currentWallet = JSON.parse(savedWallet);
+            } else if (depositComplete) {
+                currentWallet = targetWalletData;
+            } else {
+                currentWallet = initialWallet;
+            }
+        }
+        
+        /** Saves the current wallet state to localStorage. */
+        function saveWalletState() {
+            localStorage.setItem(WALLET_KEY, JSON.stringify(currentWallet));
+        }
+
+        /** Loads recipient data from session storage and updates the header. */
+        function loadTransferData() {
+            const storedData = sessionStorage.getItem(TEMP_TRANSFER_KEY);
+            if (!storedData) {
+                window.location.href = 'sendfundstep1.html';
+                return;
+            }
+            transferData = JSON.parse(storedData);
+            
+            // Set defaults if currencies somehow got lost
+            if (!transferData.sourceCurrency) transferData.sourceCurrency = 'USD';
+            if (!transferData.targetCurrency) transferData.targetCurrency = 'EUR';
+
+            // Update recipient preview
+            document.getElementById('preview-name').textContent = transferData.recipientName;
+            document.getElementById('preview-id-bank').textContent = `${transferData.recipientId} | ${transferData.recipientBank}`;
+        }
+        
+        /** Converts currency amount using the defined conversion rates. */
+        function convertCurrency(amount, fromCurrency, toCurrency) {
+            if (fromCurrency === toCurrency) return amount;
+            
+            // 1. Convert source amount to USD
+            const rateFromUSD = usdConversionRates[fromCurrency];
+            const amountInUSD = amount / rateFromUSD; 
+            
+            // 2. Convert USD amount to target currency
+            const rateUSDToTarget = usdConversionRates[toCurrency];
+            
+            return amountInUSD * rateUSDToTarget;
+        }
+
+        /** Formats a number as currency based on the currency code. */
+        function formatCurrency(amount, currencyCode) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currencyCode,
+                minimumFractionDigits: currencyCode === 'JPY' ? 0 : 2,
+            }).format(amount);
+        }
+
+        /** Populates quick amount buttons based on the source currency. */
+        function populateQuickAmounts(sourceCurrency) {
+            const container = document.getElementById('quick-amounts-container');
+            container.innerHTML = '';
+            const config = CURRENCY_CONFIG[sourceCurrency] || CURRENCY_CONFIG['USD'];
+            
+            config.amounts.forEach(amount => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'quick-amount-btn py-2 rounded-lg text-sm font-semibold';
+                btn.textContent = `${config.symbol}${amount.toLocaleString()}`;
+                btn.setAttribute('data-amount', amount);
+                btn.onclick = () => {
+                    document.getElementById('amount').value = amount;
+                    updateCalculations();
+                    document.querySelectorAll('.quick-amount-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                };
+                container.appendChild(btn);
+            });
+        }
+        
+        /** Sets up the remark selection listener. */
+        function setupRemarkListeners() {
+            document.querySelectorAll('.remark-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.remark-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+        }
+
+        // --- Currency Modal Functions ---
+
+        /** Populates the select dropdowns in the currency modal. */
+        function populateCurrencySelectors() {
+            const sourceSelect = document.getElementById('modal-source-currency');
+            const targetSelect = document.getElementById('modal-target-currency');
+            
+            [sourceSelect, targetSelect].forEach(select => {
+                select.innerHTML = ''; // Clear previous options
+                ALL_CURRENCIES.forEach(code => {
+                    const option = document.createElement('option');
+                    option.value = code;
+                    option.textContent = `${code} - ${CURRENCY_CONFIG[code].name}`;
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        /** Opens the currency modal and sets the current values. */
+        function openCurrencyModal() {
+            populateCurrencySelectors();
+            document.getElementById('modal-source-currency').value = transferData.sourceCurrency;
+            document.getElementById('modal-target-currency').value = transferData.targetCurrency;
+            document.getElementById('currency-modal').classList.remove('hidden');
+        }
+
+        /** Closes the currency modal. */
+        function closeCurrencyModal() {
+            document.getElementById('currency-modal').classList.add('hidden');
+        }
+
+        /** Applies the new currency selections and updates the UI. */
+        function applyCurrencyChanges() {
+            const newSource = document.getElementById('modal-source-currency').value;
+            const newTarget = document.getElementById('modal-target-currency').value;
+
+            if (newSource !== transferData.sourceCurrency || newTarget !== transferData.targetCurrency) {
+                
+                // 1. Update global transfer data
+                transferData.sourceCurrency = newSource;
+                transferData.targetCurrency = newTarget;
+
+                // 2. Persist the change to session storage
+                sessionStorage.setItem(TEMP_TRANSFER_KEY, JSON.stringify(transferData));
+
+                // 3. Re-initialize UI components with new currencies
+                populateQuickAmounts(newSource);
+                updateCalculations(); // Recalculate based on new currencies
+            }
+
+            closeCurrencyModal();
+        }
+
+        // --- Core Calculations ---
+
+        /**
+         * Updates all calculated summary fields and enables/disables the button.
+         */
+        function updateCalculations() {
+            // Read currencies from transferData
+            const sourceCurrency = transferData.sourceCurrency;
+            const targetCurrency = transferData.targetCurrency;
+            
+            const amountInput = document.getElementById('amount');
+            let amount = parseFloat(amountInput.value) || 0;
+
+            const sourceWallet = currentWallet[sourceCurrency];
+            const availableBalance = sourceWallet ? sourceWallet.balance : 0;
+            
+            const totalCost = amount * (1 + FEE_PERCENTAGE);
+            
+            const confirmButton = document.getElementById('confirm-button');
+            const validationErrorEl = document.getElementById('validation-error');
+            const summaryArea = document.getElementById('summary-area');
+            let isValid = true;
+
+            // 1. Update UI Labels
+            const sourceSymbol = CURRENCY_CONFIG[sourceCurrency].symbol;
+            document.getElementById('source-symbol-prefix').textContent = sourceSymbol;
+            document.getElementById('amount-unit').textContent = sourceCurrency;
+
+            // Clear quick amount active state
+            document.querySelectorAll('.quick-amount-btn').forEach(b => b.classList.remove('active'));
+
+            // 2. Validation
+            if (amount <= 0 || isNaN(amount)) {
+                isValid = false;
+                summaryArea.classList.add('hidden');
+            } else if (totalCost > availableBalance) {
+                isValid = false;
+                validationErrorEl.textContent = `Insufficient funds. Available: ${formatCurrency(availableBalance, sourceCurrency)}`;
+            } 
+            
+            // 3. Perform Calculations
+            const recipientReceivesAmount = convertCurrency(amount, sourceCurrency, targetCurrency);
+            const conversionRate = convertCurrency(1, sourceCurrency, targetCurrency);
+            const fee = amount * FEE_PERCENTAGE;
+            
+            // 4. Update Summary
+            const totalCostFormatted = formatCurrency(totalCost, sourceCurrency);
+            const recipientReceivesFormatted = formatCurrency(recipientReceivesAmount, targetCurrency);
+
+            document.getElementById('total-cost').textContent = totalCostFormatted;
+            document.getElementById('recipient-receives').textContent = recipientReceivesFormatted;
+            document.getElementById('transfer-fee').textContent = `-${formatCurrency(fee, sourceCurrency)} (Rate: 1 ${sourceCurrency} ≈ ${conversionRate.toFixed(4)} ${targetCurrency})`;
+
+            // 5. Update Button State and Visibility
+            if (isValid && amount > 0) {
+                confirmButton.disabled = false;
+                confirmButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                validationErrorEl.classList.add('hidden');
+                summaryArea.classList.remove('hidden');
+            } else {
+                confirmButton.disabled = true;
+                confirmButton.classList.add('opacity-50', 'cursor-not-allowed');
+                if (amount > 0) validationErrorEl.classList.remove('hidden');
+            }
+        }
+
+        /**
+         * Handles the "Confirm" button click: Sets final data and redirects to PIN setup.
+         */
+        function handleConfirm() {
+            // Update transferData with final details before redirecting
+            const amount = parseFloat(document.getElementById('amount').value);
+            const totalCost = amount * (1 + FEE_PERCENTAGE);
+            const recipientReceivesAmount = convertCurrency(amount, transferData.sourceCurrency, transferData.targetCurrency);
+            const selectedRemark = document.querySelector('.remark-btn.active').getAttribute('data-remark');
+
+            transferData.transferAmount = amount;
+            transferData.totalCost = totalCost;
+            transferData.recipientReceives = recipientReceivesAmount;
+            transferData.remark = selectedRemark;
+
+            // 1. Persist the final transfer details (needed for PIN confirmation)
+            sessionStorage.setItem(TEMP_TRANSFER_KEY, JSON.stringify(transferData));
+
+            // 2. Redirect to PIN setup page
+            window.location.href = 'pincreation.html'; 
+        }
+
+        // REMOVED: function closeModal() {} (was used by the old success modal)
+
+
+        // --- Initial Load Setup ---
+        window.onload = function() {
+            loadWalletState();
+            loadTransferData();
+            
+            // Populate quick amounts using the selected source currency
+            populateQuickAmounts(transferData.sourceCurrency);
+            setupRemarkListeners();
+            updateCalculations(); 
+        }
+    </script>
+
+</body>
+</html>

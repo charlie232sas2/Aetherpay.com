@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherPay - Premium Global Transfers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Define custom glassmorphism styles and transitions */
+        :root {
+            --primary-color: #00B3FF; /* Electric Teal/Blue */
+            --background-start: #0A1128;
+            --background-end: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Deep, dark gradient background */
+            background: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+            min-height: 100vh;
+            color: #E5E7EB; /* Light gray text for contrast */
+        }
+
+        .glass-card {
+            background-color: rgba(18, 25, 48, 0.5); /* Darker, slightly blue semi-transparent base */
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.15); /* Light, subtle border */
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth motion */
+        }
+
+        .glass-card:hover {
+            border-color: rgba(0, 179, 255, 0.4); /* Teal glow on hover */
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.7);
+        }
+
+        .cta-button {
+            /* Electric Teal/Blue gradient for CTAs */
+            background: linear-gradient(90deg, #0077B6 0%, var(--primary-color) 100%);
+            box-shadow: 0 4px 15px rgba(0, 179, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            box-shadow: 0 8px 25px rgba(0, 179, 255, 0.8);
+            transform: scale(1.03);
+        }
+
+        /* Custom scrollbar for premium feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0A1128;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 179, 255, 0.5);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 179, 255, 0.8);
+        }
+
+        /* Subtle animation for the hero text */
+        @keyframes fadeInSlide {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-hero {
+            animation: fadeInSlide 1s ease-out forwards;
+        }
+        
+        /* Mobile menu specific styles */
+        .mobile-menu-container {
+            position: absolute;
+            top: 100%; /* Position right below the header */
+            right: 0;
+            width: 80%; /* Takes up most of the screen width */
+            max-width: 300px;
+            z-index: 50;
+            /* Same glassmorphism style as other elements */
+            background-color: rgba(18, 25, 48, 0.9); 
+            backdrop-filter: blur(15px);
+            border-radius: 0 0 1rem 1rem;
+            transform: translateY(-10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .mobile-menu-container.open {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="app" class="relative min-h-screen">
+        <div class="absolute inset-0 z-0 overflow-hidden">
+            <div class="w-96 h-96 bg-blue-900 opacity-20 rounded-full mix-blend-lighten absolute top-10 left-[-10rem] animate-pulse"></div>
+            <div class="w-80 h-80 bg-teal-500 opacity-10 rounded-full mix-blend-lighten absolute bottom-20 right-[-10rem] animate-pulse"></div>
+        </div>
+
+        <header class="relative z-20 p-4 md:p-8">
+            <nav class="flex justify-between items-center max-w-7xl mx-auto relative">
+                <a href="index.html" class="flex items-center text-3xl font-bold text-white tracking-wider">
+                    <i data-lucide="zap" class="w-8 h-8 mr-2 text-primary-color"></i>
+                    Aether<span class="font-light text-primary-color">Pay</span>
+                </a>
+                
+                <button id="menu-toggle" onclick="toggleMobileMenu()" class="md:hidden p-2 glass-card">
+                    <i data-lucide="menu" class="w-6 h-6 text-white"></i>
+                </button>
+                
+                <div id="mobile-menu" class="mobile-menu-container glass-card md:hidden">
+                    <a href="auth.html" class="flex items-center p-4 space-x-3 text-lg font-semibold text-white hover:bg-gray-700/50 transition duration-200 border-b border-gray-800">
+                        <i data-lucide="log-in" class="w-6 h-6 text-primary-color"></i>
+                        <span>Sign In / Register</span>
+                    </a>
+                                        <a href="https://twitter.com/AetherPaySupport" target="_blank" rel="noopener noreferrer" class="flex items-center p-4 space-x-3 text-lg font-semibold text-white hover:bg-gray-700/50 transition duration-200">
+                        <i data-lucide="message-square" class="w-6 h-6 text-primary-color"></i>
+                        <span>Customer Support</span>
+                    </a>
+
+                    
+                    <hr class="border-gray-800 my-1">
+                    
+                    
+
+                </div>
+
+
+                <div class="hidden md:flex space-x-8 items-center text-sm font-medium">
+                    
+                    <a href="auth.html" class="cta-button px-6 py-2 rounded-xl text-white font-semibold shadow-lg">
+                        Sign In / Register
+                    </a>
+                </div>
+            </nav>
+        </header>
+
+        <main class="relative z-10 max-w-7xl mx-auto px-4 py-12 md:py-24 grid lg:grid-cols-2 gap-12 items-center">
+
+            <div class="space-y-6 animate-hero">
+                <p class="text-sm uppercase tracking-widest text-primary-color font-semibold opacity-0" style="animation-delay: 0.2s;">
+                    The Future of Cross-Border Finance
+                </p>
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white leading-tight opacity-0" style="animation-delay: 0.4s;">
+                    Elite Transfers.
+                    <span class="text-primary-color block">Zero Compromise.</span>
+                </h1>
+                <p class="text-lg text-gray-400 max-w-md opacity-0" style="animation-delay: 0.6s;">
+                    Send, receive, and manage capital globally with institutional-grade security and transparent pricing. Trusted by high-net-worth individuals and global enterprises.
+                </p>
+                <div class="pt-4 opacity-0" style="animation-delay: 0.8s;">
+                    <a href="auth.html" class="cta-button px-8 py-3 rounded-2xl text-white font-bold text-lg shadow-xl flex items-center">
+                        <i data-lucide="rocket" class="w-5 h-5 mr-2"></i>
+                        Start Transfer Now
+                    </a>
+                </div>
+            </div>
+
+            <div id="transfer-card" class="glass-card p-6 md:p-8 rounded-2xl w-full max-w-lg lg:justify-self-end mt-10 lg:mt-0 animate-hero opacity-0" style="animation-delay: 1s;">
+                <h2 class="text-2xl font-bold mb-6 text-white flex items-center">
+                    <i data-lucide="arrow-right-left" class="w-6 h-6 mr-3 text-primary-color"></i>
+                    Live Exchange Simulation
+                </h2>
+
+                <div class="mb-5 p-4 rounded-xl border border-gray-700 bg-gray-900/40 transition duration-300 hover:border-primary-color/50">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">You Send Exactly</label>
+                    <div class="flex items-center">
+                        <input id="send-amount" type="number" value="10000" min="100" class="w-full text-3xl font-bold bg-transparent border-none focus:ring-0 p-0 text-white" oninput="calculateTransfer()">
+                        <select id="send-currency" class="appearance-none bg-gray-800/60 text-white p-2 rounded-lg text-lg font-semibold border-none focus:ring-primary-color ml-2" onchange="calculateTransfer()">
+                            <option value="USD">USD</option>
+                            <option value="EUR" selected>EUR</option>
+                            <option value="GBP">GBP</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center text-sm mb-4 text-gray-300">
+                    <span class="flex items-center">
+                        <i data-lucide="trending-up" class="w-4 h-4 mr-2 text-green-400"></i>
+                        Rate:
+                    </span>
+                    <span id="exchange-rate" class="font-medium text-green-400">1 EUR = 1.085 USD</span>
+                </div>
+
+                <div class="flex justify-between items-center text-sm mb-6 text-gray-300">
+                    <span class="flex items-center">
+                        <i data-lucide="briefcase" class="w-4 h-4 mr-2 text-red-400"></i>
+                        Transfer Fee:
+                    </span>
+                    <span id="transfer-fee" class="font-medium text-red-400">$19.00 (0.19%)</span>
+                </div>
+
+                <div class="mb-8 p-4 rounded-xl border border-gray-700 bg-gray-900/40 transition duration-300 hover:border-primary-color/50">
+                    <label class="block text-sm font-medium text-gray-400 mb-1">Recipient Gets</label>
+                    <div class="flex items-center">
+                        <input id="receive-amount" type="text" value="10831.00" readonly class="w-full text-3xl font-bold bg-transparent border-none focus:ring-0 p-0 text-white opacity-75">
+                        <select id="receive-currency" class="appearance-none bg-gray-800/60 text-white p-2 rounded-lg text-lg font-semibold border-none focus:ring-primary-color ml-2" onchange="calculateTransfer()">
+                            <option value="USD" selected>USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="JPY">JPY</option>
+                        </select>
+                    </div>
+                </div>
+
+                <a href="auth.html" class="cta-button w-full py-3 rounded-xl text-white font-bold text-lg shadow-lg">
+                    Proceed to Recipient Details
+                </a>
+            </div>
+        </main>
+
+        <section id="security" class="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">Institutional Grade Trust & Speed</h2>
+
+            <div class="flex overflow-x-auto snap-x space-x-6 pb-4 md:grid md:grid-cols-3 md:gap-8">
+
+                <div class="glass-card p-6 rounded-2xl min-w-[280px] snap-center">
+                    <i data-lucide="shield-check" class="w-8 h-8 text-primary-color mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2 text-white">Biometric Security</h3>
+                    <p class="text-gray-400 text-sm">Mandatory 2FA and Biometric validation on every high-value transaction. Your funds are secured by military-grade encryption.</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl min-w-[280px] snap-center">
+                    <i data-lucide="zap" class="w-8 h-8 text-primary-color mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2 text-white">Instant Global Rails</h3>
+                    <p class="text-gray-400 text-sm">Leverage our private payment infrastructure. 80% of transfers settle instantly, regardless of destination country or currency.</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-2xl min-w-[280px] snap-center">
+                    <i data-lucide="gavel" class="w-8 h-8 text-primary-color mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2 text-white">Tier-1 Regulated</h3>
+                    <p class="text-gray-400 text-sm">Fully licensed and regulated across all major financial jurisdictions (FCA, FinCEN, MAS). Compliance is our highest priority.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <section id="dashboard-preview" class="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 text-white">A Global Financial Dashboard</h2>
+            <p class="text-center text-gray-400 mb-16 max-w-2xl mx-auto">Manage your multi-currency wallet, physical and virtual cards, and KYC documents from a single, polished interface.</p>
+
+            <div class="glass-card p-4 md:p-8 rounded-3xl grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 space-y-6">
+                    <div class="bg-gray-900/50 p-6 rounded-xl border border-gray-700/50">
+                        <h3 class="text-xl font-semibold mb-3 text-primary-color">Multi-Currency Wallet</h3>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-800">
+                            <span class="text-lg font-medium">USD Balance</span>
+                            <span class="text-2xl font-bold">$145,200.55</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-800">
+                            <span class="text-lg font-medium">EUR Balance</span>
+                            <span class="text-2xl font-bold">€88,410.20</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-lg font-medium">GBP Balance</span>
+                            <span class="text-2xl font-bold">£52,990.15</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-xl">
+                        <h3 class="text-lg font-semibold mb-2 text-white flex items-center">
+                            <i data-lucide="fingerprint" class="w-5 h-5 mr-2 text-primary-color"></i>
+                            KYC Status
+                        </h3>
+                        <p class="text-green-400 font-bold">Verified - Tier 3</p>
+                        <p class="text-gray-400 text-sm mt-1">Maximum daily limit: $10,000,000</p>
+                    </div>
+
+                    <div class="h-48 bg-gradient-to-tr from-gray-700 to-gray-900 rounded-xl p-5 shadow-2xl relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('https://placehold.co/400x200/0A1128/FFFFFF?text=AetherCard')] opacity-5"></div>
+                        <div class="relative">
+                            <p class="text-sm text-gray-400 mb-8">Virtual Corporate Card</p>
+                            <p class="text-2xl font-mono tracking-widest text-white">4567 **** **** 8901</p>
+                            <div class="mt-4 flex justify-between items-center">
+                                <p class="text-lg font-bold text-white">AETHERPAY</p>
+                                <i data-lucide="wifi" class="w-6 h-6 text-yellow-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <h3 class="text-2xl font-bold mb-6 text-white flex items-center">
+                        <i data-lucide="history" class="w-6 h-6 mr-3 text-primary-color"></i>
+                        Recent Transactions
+                    </h3>
+
+                    <div id="transactions-list" class="space-y-4">
+                        <div class="flex justify-between items-center p-4 rounded-xl bg-gray-900/50 hover:bg-gray-800/50 transition duration-300">
+                            <div class="flex items-center space-x-4">
+                                <div class="p-3 rounded-full bg-red-600/20 text-red-400">
+                                    <i data-lucide="arrow-up-right"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-white">Transfer to J.P. Morgan Chase</p>
+                                    <p class="text-xs text-gray-400">Sept 12, 2025 · Cross-Border Payment</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-red-400">-$50,000.00</p>
+                                <p class="text-xs text-gray-500">USD</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center p-4 rounded-xl bg-gray-900/50 hover:bg-gray-800/50 transition duration-300">
+                            <div class="flex items-center space-x-4">
+                                <div class="p-3 rounded-full bg-green-600/20 text-green-400">
+                                    <i data-lucide="arrow-down-left"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-white">Incoming Wire from Barclays UK</p>
+                                    <p class="text-xs text-gray-400">Sept 10, 2025 · Corporate Treasury</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-green-400">+£120,000.00</p>
+                                <p class="text-xs text-gray-500">GBP</p>
+                            </div>
+                        </div>
+
+                         <div class="flex justify-between items-center p-4 rounded-xl bg-gray-900/50 hover:bg-gray-800/50 transition duration-300">
+                            <div class="flex items-center space-x-4">
+                                <div class="p-3 rounded-full bg-blue-600/20 text-primary-color">
+                                    <i data-lucide="credit-card"></i>
+                                </div>
+                                <div>
+                                    <p class="font-semibold text-white">Software Subscription Payment</p>
+                                    <p class="text-xs text-gray-400">Sept 8, 2025 · Virtual Card Use</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-bold text-red-400">-$899.00</p>
+                                <p class="text-xs text-gray-500">USD</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="w-full mt-6 py-2 rounded-xl border border-primary-color/50 text-primary-color hover:bg-primary-color/10 transition duration-300">
+                        View All Transactions
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="relative z-10 max-w-7xl mx-auto px-4 py-12 border-t border-gray-800 mt-16">
+            <div class="text-center text-gray-500 text-sm">
+                &copy; 2025 AetherPay. All Rights Reserved. Regulated Financial Institution.
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+        
+        /**
+         * Toggles the visibility of the mobile menu dropdown.
+         */
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('open');
+        }
+
+
+        // Transfer Card Logic (Mock Calculation)
+        function calculateTransfer() {
+            const sendAmount = parseFloat(document.getElementById('send-amount').value) || 0;
+            const sendCurrency = document.getElementById('send-currency').value;
+            const receiveCurrency = document.getElementById('receive-currency').value;
+
+            // Mock Rates based on EUR as base
+            const rates = {
+                'EUR_USD': 1.085,
+                'EUR_GBP': 0.85,
+                'EUR_JPY': 165.20,
+                'USD_EUR': 1 / 1.085,
+                'GBP_EUR': 1 / 0.85,
+                'JPY_EUR': 1 / 165.20,
+            };
+
+            let amountInBase = 0;
+            let finalAmount = 0;
+            const feeRate = 0.0019; // 0.19% fee
+            let rateKey = `${sendCurrency}_${receiveCurrency}`;
+            let exchangeRate = 1;
+
+            if (sendCurrency === receiveCurrency) {
+                finalAmount = sendAmount;
+                exchangeRate = 1;
+            } else if (rates[rateKey]) {
+                exchangeRate = rates[rateKey];
+                amountInBase = sendAmount;
+            } else {
+                // Cross-currency calculation (e.g., USD to JPY, using EUR as pivot)
+                const baseToEurKey = `${sendCurrency}_EUR`;
+                const eurToReceiveKey = `EUR_${receiveCurrency}`;
+
+                if (rates[baseToEurKey] && rates[eurToReceiveKey]) {
+                    exchangeRate = rates[baseToEurKey] * rates[eurToReceiveKey];
+                    amountInBase = sendAmount;
+                } else {
+                    // Fallback to direct rate if possible (e.g. if the user chose a non-base currency)
+                    // Simple example: if send is USD and receive is EUR
+                    if (sendCurrency === 'USD' && receiveCurrency === 'EUR') {
+                        exchangeRate = rates['USD_EUR'];
+                        amountInBase = sendAmount;
+                    }
+                }
+            }
+
+            // Calculate Fee and Final Amount
+            const fee = sendAmount * feeRate;
+            const amountAfterFee = sendAmount - fee;
+            finalAmount = amountAfterFee * exchangeRate;
+
+            // Update UI
+            document.getElementById('exchange-rate').textContent = `1 ${sendCurrency} = ${exchangeRate.toFixed(4)} ${receiveCurrency}`;
+            document.getElementById('transfer-fee').textContent = `${sendCurrency === 'USD' ? '$' : sendCurrency === 'EUR' ? '€' : '£'}${fee.toFixed(2)} (${(feeRate * 100).toFixed(2)}%)`;
+            document.getElementById('receive-amount').value = finalAmount.toFixed(2);
+        }
+
+        // Run the calculation on load
+        window.onload = function() {
+            calculateTransfer();
+        }
+    </script>
+
+</body>
+</html>
